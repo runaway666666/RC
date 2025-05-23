@@ -1,42 +1,54 @@
-#include "rc.hpp"
-#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include "rc.h"
+
+void print_hex(const char* label, const unsigned char* data, size_t len) {
+    char hex[2*len+1];
+    to_hex(data, len, hex);
+    printf("%s: %s\n", label, hex);
+}
 
 int main() {
-    // RC2
-    std::string rc2_key = "rc2key88";
-    std::string rc2_plain = "OpenAI!!";
-    RC2 rc2(rc2_key);
-    std::string rc2_encrypted = rc2.encrypt(rc2_plain);
-    std::string rc2_decrypted = rc2.decrypt(rc2_encrypted);
-    std::cout << "RC2 encrypted: " << to_hex(rc2_encrypted) << std::endl;
-    std::cout << "RC2 decrypted: " << rc2_decrypted << std::endl;
+    unsigned char ciphertext[256], decrypted[256];
+    size_t enclen, declen;
 
-    // RC4 (stream)
-    std::string rc4_key = "secretkey";
-    std::string rc4_plain = "RC4 is a stream cipher!";
-    RC4 rc4(rc4_key);
-    std::string rc4_encrypted = rc4.encrypt(rc4_plain);
-    std::string rc4_decrypted = rc4.decrypt(rc4_encrypted);
-    std::cout << "RC4 encrypted: " << to_hex(rc4_encrypted) << std::endl;
-    std::cout << "RC4 decrypted: " << rc4_decrypted << std::endl;
+    // RC2 DEMO
+    printf("===== RC2 DEMO =====\n");
+    const char* rc2_key = "myrc2key";
+    const char* rc2_plain = "RC2block";
+    enclen = RC2_Encrypt(rc2_key, rc2_plain, ciphertext);
+    print_hex("RC2 Ciphertext", ciphertext, enclen);
+    declen = RC2_Decrypt(rc2_key, ciphertext, enclen, decrypted);
+    printf("RC2 Decrypted: %.*s\n\n", (int)declen, decrypted);
 
-    // RC5
-    std::string rc5_key = "rc5key88";
-    std::string rc5_plain = "Copilot!";
-    RC5 rc5(rc5_key);
-    std::string rc5_encrypted = rc5.encrypt(rc5_plain);
-    std::string rc5_decrypted = rc5.decrypt(rc5_encrypted);
-    std::cout << "RC5 encrypted: " << to_hex(rc5_encrypted) << std::endl;
-    std::cout << "RC5 decrypted: " << rc5_decrypted << std::endl;
+    // RC4 DEMO
+    printf("===== RC4 DEMO =====\n");
+    const char* rc4_key = "myrc4key";
+    const char* rc4_plain = "Arbitrary RC4 data!";
+    size_t rc4_len = strlen(rc4_plain);
+    RC4_Encrypt(rc4_key, rc4_plain, ciphertext);
+    print_hex("RC4 Ciphertext", ciphertext, rc4_len);
+    RC4_Decrypt(rc4_key, ciphertext, rc4_len, decrypted);
+    decrypted[rc4_len] = '\0'; // Null-terminate for print
+    printf("RC4 Decrypted: %s\n\n", decrypted);
 
-    // RC6
-    std::string rc6_key = "rc6key16bytes!!";
-    std::string rc6_plain = "RC6TEST-1234567";
-    RC6 rc6(rc6_key);
-    std::string rc6_encrypted = rc6.encrypt(rc6_plain);
-    std::string rc6_decrypted = rc6.decrypt(rc6_encrypted);
-    std::cout << "RC6 encrypted: " << to_hex(rc6_encrypted) << std::endl;
-    std::cout << "RC6 decrypted: " << rc6_decrypted << std::endl;
+    // RC5 DEMO
+    printf("===== RC5 DEMO =====\n");
+    const char* rc5_key = "myrc5key";
+    const char* rc5_plain = "RC5block";
+    enclen = RC5_Encrypt(rc5_key, rc5_plain, ciphertext, 12);
+    print_hex("RC5 Ciphertext", ciphertext, enclen);
+    declen = RC5_Decrypt(rc5_key, ciphertext, enclen, decrypted, 12);
+    printf("RC5 Decrypted: %.*s\n\n", (int)declen, decrypted);
+
+    // RC6 DEMO
+    printf("===== RC6 DEMO =====\n");
+    const char* rc6_key = "myrc6key";
+    const char* rc6_plain = "RC6_BLOCK_DATA!!";
+    enclen = RC6_Encrypt(rc6_key, rc6_plain, ciphertext, 20);
+    print_hex("RC6 Ciphertext", ciphertext, enclen);
+    declen = RC6_Decrypt(rc6_key, ciphertext, enclen, decrypted, 20);
+    printf("RC6 Decrypted: %.*s\n", (int)declen, decrypted);
 
     return 0;
 }
